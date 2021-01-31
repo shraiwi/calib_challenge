@@ -4,15 +4,13 @@ import numpy as np
 
 class FlowState:
     frame_y : np.ndarray
-    features : Any
+    features : np
 
 inpath = r"labeled/0.hevc"
 
 invc = cv2.VideoCapture(inpath)
 
 state_last : FlowState = None
-
-feat_det = cv2.FastFeatureDetector_create()
 
 while invc.isOpened():
 
@@ -24,7 +22,7 @@ while invc.isOpened():
     if state_last is None: state_last = state_now
 
     state_now.frame_y = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
-    state_now.features = feat_det.detect(state_now.frame_y)
+    state_now.features = cv2.goodFeaturesToTrack(state_now.frame_y, 500, 0.3, 7)
 
     flow = cv2.calcOpticalFlowPyrLK(state_last.frame_y, state_now.frame_y, state_last.features, state_now.features)
 
